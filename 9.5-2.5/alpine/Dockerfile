@@ -1,5 +1,7 @@
-FROM postgres:9.5-alpine
-MAINTAINER Régis Belson <me@regisbelson.fr>
+FROM shajekpivotal/postgres-9.5-plpython
+
+# ====================
+# ADD POSTGIS
 
 ENV POSTGIS_VERSION 2.5.2
 ENV POSTGIS_SHA256 225aeaece00a1a6a9af15526af81bef2af27f4c198de820af1367a792ee1d1a9
@@ -32,11 +34,11 @@ RUN set -ex \
         perl \
     \
     && apk add --no-cache --virtual .build-deps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \    
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         gdal-dev \
         geos-dev \
-        proj4-dev \
+        proj-dev \
         protobuf-c-dev \
     && cd /usr/src/postgis \
     && ./autogen.sh \
@@ -49,11 +51,11 @@ RUN set -ex \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
     && apk add --no-cache --virtual .postgis-rundeps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \    
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \        
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         geos \
         gdal \
-        proj4 \
+        proj \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \
@@ -61,3 +63,5 @@ RUN set -ex \
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
+
+EXPOSE 5432
